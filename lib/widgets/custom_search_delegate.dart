@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/models/task_model.dart';
@@ -57,7 +58,7 @@ class CustomSearchDelegate extends SearchDelegate {
                     SizedBox(
                       width: 8,
                     ),
-                    Text('Bu görev silindi')
+                    Text('remove_task').tr()
                   ],
                 ),
                 key: Key(_oankiListeElemani.id),
@@ -72,7 +73,7 @@ class CustomSearchDelegate extends SearchDelegate {
             itemCount: filteredList.length,
           )
         : Center(
-            child: Text('Aradiğinizi bulamadik'),
+            child: Text('search_not_found').tr(),
           );
   }
 

@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, unused_local_variable, unused_field, prefer_const_literals_to_create_immutables
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:todo_app/data/local_storage.dart';
+import 'package:todo_app/helper/translation_helper.dart';
 import 'package:todo_app/models/task_model.dart';
 import 'package:todo_app/widgets/task_list_item.dart';
 
@@ -40,9 +42,9 @@ class _HomePageState extends State<HomePage> {
             _showAddTaskBottomSheet();
           },
           child: const Text(
-            'Bugün Neler Yapacaksin?',
+            'title',
             style: TextStyle(color: Colors.black),
-          ),
+          ).tr(),
         ),
         centerTitle: false,
         actions: [
@@ -75,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         width: 8,
                       ),
-                      Text('Bu görev silindi')
+                      Text('remove_task').tr()
                     ],
                   ),
                   key: Key(_oankiListeElemani.id),
@@ -90,7 +92,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: _allTasks.length,
             )
           : Center(
-              child: Text('Hadi görev ekle'),
+              child: Text('empty_task_list').tr(),
             ),
     );
   }
@@ -109,8 +111,9 @@ class _HomePageState extends State<HomePage> {
               onSubmitted: ((value) {
                 Navigator.of(context).pop();
                 if (value.length > 2) {
-                  DatePicker.showTimePicker(context, showSecondsColumn: false,
-                      onConfirm: (time) async {
+                  DatePicker.showTimePicker(context,
+                      locale: TranslationHelper.getDeviceLanguage(context),
+                      showSecondsColumn: false, onConfirm: (time) async {
                     var yenieklenecekGorev =
                         Task.create(name: value, creatAt: time);
                     // _allTasks.add(yenieklenecekGorev);
@@ -122,7 +125,7 @@ class _HomePageState extends State<HomePage> {
               }),
               style: TextStyle(fontSize: 20),
               decoration: InputDecoration(
-                  hintText: 'Görev Nedir?', border: InputBorder.none),
+                  hintText: 'add_task'.tr(), border: InputBorder.none),
             ),
           ),
         );
