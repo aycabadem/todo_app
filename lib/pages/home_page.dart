@@ -2,8 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:todo_app/data/local_storage.dart';
 import 'package:todo_app/models/task_model.dart';
 import 'package:todo_app/widgets/task_list_item.dart';
+
+import '../main.dart';
+import '../widgets/custom_search_delegate.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,11 +18,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<Task> _allTasks;
+
+  late LocalStorage _localStorage;
+
   @override
   void initState() {
     super.initState();
+    _localStorage = locator<LocalStorage>();
     _allTasks = <Task>[];
-    _allTasks.add(Task.create(name: 'Deneme Task', creatAt: DateTime.now()));
+    // _allTasks.add(Task.create(name: 'Deneme Task', creatAt: DateTime.now()));
+    _getAllTaskFromDb();
   }
 
   @override
@@ -28,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () {
-            _showAddTaskBottomSheet(context);
+            _showAddTaskBottomSheet();
           },
           child: const Text(
             'Bugün Neler Yapacaksin?',
@@ -38,12 +47,14 @@ class _HomePageState extends State<HomePage> {
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              _showSearchPage();
+            },
             icon: const Icon(Icons.search),
           ),
           IconButton(
             onPressed: () {
-              _showAddTaskBottomSheet(context);
+              _showAddTaskBottomSheet();
             },
             icon: const Icon(Icons.add),
           ),
@@ -70,6 +81,7 @@ class _HomePageState extends State<HomePage> {
                   key: Key(_oankiListeElemani.id),
                   onDismissed: (direction) {
                     _allTasks.removeAt(index);
+                    _localStorage.deleteTask(task: _oankiListeElemani);
                     setState(() {});
                   },
                   child: TaskItem(task: _oankiListeElemani),
@@ -83,7 +95,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showAddTaskBottomSheet(BuildContext context) {
+  void _showAddTaskBottomSheet() {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -98,10 +110,12 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).pop();
                 if (value.length > 2) {
                   DatePicker.showTimePicker(context, showSecondsColumn: false,
-                      onConfirm: (time) {
+                      onConfirm: (time) async {
                     var yenieklenecekGorev =
                         Task.create(name: value, creatAt: time);
-                    _allTasks.add(yenieklenecekGorev);
+                    // _allTasks.add(yenieklenecekGorev);
+                    _allTasks.insert(0, yenieklenecekGorev);
+                    await _localStorage.addTask(task: yenieklenecekGorev);
                     setState(() {});
                   });
                 }
@@ -114,5 +128,16 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  void _getAllTaskFromDb() async {
+    _allTasks = await _localStorage.getAllTask();
+    setState(() {});
+  }
+
+  Future<void> _showSearchPage() async {
+    await showSearch(
+        context: context, delegate: CustomSearchDelegate(allTasks: _allTasks));
+    _getAllTaskFromDb();
   }
 }

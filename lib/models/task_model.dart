@@ -1,11 +1,21 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:hive_flutter/adapters.dart';
 import 'package:uuid/uuid.dart';
+part 'task_model.g.dart';
 
-class Task {
+@HiveType(typeId: 1)
+class Task extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   String name;
+
+  @HiveField(2)
   final DateTime creatAt;
+
+  @HiveField(3)
   bool isCompleted;
 
   Task(
